@@ -3,9 +3,6 @@
 
 # Template environment for all of my vagrant vms. 
 Vagrant.configure("2") do |config|
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
 
   # found box on this site: https://app.vagrantup.com/bento/boxes/ubuntu-16.04
   config.vm.box = "bento/ubuntu-16.04"
@@ -32,8 +29,6 @@ Vagrant.configure("2") do |config|
 
   # provision script, install all necessary items here
   config.vm.provision "shell", inline: <<-SHELL
-    apt update
-    apt upgrade -y
-    apt install -y apache2
+    apt update && sleep 1 && apt upgrade -y
   SHELL
 end
