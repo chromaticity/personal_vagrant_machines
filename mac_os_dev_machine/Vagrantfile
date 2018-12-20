@@ -41,9 +41,7 @@ Vagrant.configure("2") do |config|
     service mysql restart
     cd / && sed -i -e 's/\r$//' ./vagrant/vagrant_configs/post_installation.bash
     sudo bash /vagrant/vagrant_configs/post_installation.bash
-    echo "System successfully installed. Everything is good to go! Type vagrant ssh to go into your vm."
-    echo "To create a new laravel project, just run 'laravel <project_name> and it will be created for you."
-    echo "Project is accessible from 192.168.33.10 from your browser."
-    echo "Your MySQL username is 'root' and password is also 'root'"
+    echo "This machine is now accessible through 192.168.33.10. Add an entry to /etc/hosts to make your life easier."
+    echo "Your MySQL username is 'root' and password is 'toor'"
   SHELL
 end
