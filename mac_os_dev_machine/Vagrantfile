@@ -4,7 +4,7 @@
 # Template environment for all of my vagrant vms. 
 Vagrant.configure("2") do |config|
 
-  # found box on this site: https://app.vagrantup.com/bento/boxes/ubuntu-16.04
+  # found box on this site: https://app.vagrantup.com/bento/boxes/ubuntu-18.04
   config.vm.box = "bento/ubuntu-18.04"
   config.vm.hostname = "development"
 
