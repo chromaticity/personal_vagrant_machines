@@ -1,0 +1,81 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Template environment for all of my vagrant vms. 
+Vagrant.configure("2") do |config|
+
+
+  ## Provision the web server machine.
+  config.vm.define "webserver" do |webserver|
+    # found box on this site: https://app.vagrantup.com/bento/boxes/ubuntu-18.04
+    webserver.vm.box = "debian/stretch64"
+    webserver.vm.hostname = "apache-server"
+
+    # opens port 80 on the vm, and sets it to 8080 for the host.
+    webserver.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+
+    # Create a private network, which allows host-only access to the machine
+    # using a specific IP.
+    webserver.vm.network "private_network", ip: "192.168.33.10"
+
+    # command below syncs the files to the virtual machine. nice.
+    webserver.vm.synced_folder "~/Projects/code", "/app/projects", type: "nfs"
+
+    # Provider-specific webserveruration so you can fine-tune various
+    # backing providers for Vagrant. These expose provider-specific options.
+    # Example for VirtualBox:
+    #
+    webserver.vm.provider "virtualbox" do |vb|
+      # Customize the amount of memory on the VM:
+      vb.memory = "2048"
+    end
+
+    # provision script, install all necessary items here
+    webserver.vm.provision "shell", inline: <<-SHELL
+      apt-get update && sleep 1 && apt-get upgrade -y
+      apt-get install -y apache2 php libapache2-mod-php php-mysql php-zip php-mbstring php-xml && sleep 1
+      sudo a2enmod rewrite
+      sudo service apache2 restart
+      cd / && sed -i -e 's/\r$//' ./vagrant/vagrant_configs/post_installation.bash
+      sudo bash /vagrant/vagrant_configs/post_installation.bash
+    SHELL
+  end
+
+
+  ## Provision the mysql database.
+  config.vm.define "mysqldatabase" do |mysqldatabase|
+    # found box on this site: https://app.vagrantup.com/bento/boxes/ubuntu-18.04
+    mysqldatabase.vm.box = "debian/stretch64"
+    mysqldatabase.vm.hostname = "mysql-db"
+
+    # opens port 80 on the vm, and sets it to 8080 for the host.
+    mysqldatabase.vm.network "forwarded_port", guest: 3306, host: 3307, host_ip: "127.0.0.1"
+
+    # Create a private network, which allows host-only access to the machine
+    # using a specific IP.
+    mysqldatabase.vm.network "private_network", ip: "192.168.33.11"
+
+    # Provider-specific mysqldatabaseuration so you can fine-tune various
+    # backing providers for Vagrant. These expose provider-specific options.
+    # Example for VirtualBox:
+    #
+    mysqldatabase.vm.provider "virtualbox" do |vb|
+      # Customize the amount of memory on the VM:
+      vb.memory = "1024"
+    end
+
+    # provision script, install all necessary items here
+    mysqldatabase.vm.provision "shell", inline: <<-SHELL
+      apt-get update && sleep 1 && apt-get upgrade -y
+      # echo "mysql-server mysql-server/root_password password toor" | sudo debconf-set-selections
+      # echo "mysql-server mysql-server/root_password_again password toor" | sudo debconf-set-selections
+      # apt-get install -y mysql-server
+      # sed -i 's/127\.0\.0\.1/0\.0\.0\.0/g' /etc/mysql/my.cnf
+      # mysql -uroot -p -e 'USE mysql; UPDATE `user` SET `Host`="%" WHERE `User`="root" AND `Host`="localhost"; DELETE FROM `user` WHERE `Host` != "%" AND `User`="root"; FLUSH PRIVILEGES;'
+      # service mysql restart
+      # echo "This machine is now accessible through 192.168.33.11."
+      # echo "Your MySQL username is 'root' and password is 'toor'"
+    SHELL
+  end
+
+end
